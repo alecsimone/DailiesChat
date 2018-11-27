@@ -1,0 +1,84 @@
+#voteTracker {
+	color: blue;
+	text-align: center;
+	margin: 6px auto;
+	font-size: 20px;
+}
+
+.chat-list__lines {
+    font-size: 20px;
+    padding: 8px 0;
+}
+
+.chat-line__message {
+	position: relative;
+	padding: .7rem 1rem .7rem 10px !important;
+	line-height: 1.4em;
+	text-indent: 38px;
+	color: hsla(0, 0%, 100%, .9);
+}
+.chat-line__message:first-line {
+	line-height: 32px;
+}
+
+img.chatter-avatar {
+	position: absolute;
+	left: 8px;
+	width: 32px;
+	height: 32px;
+	border-radius: 16px;
+	margin-right: 5px;
+}
+img.dailiesSubBadge.chat-badge, img.dailiesModBadge.chat-badge {
+    width: 22px;
+}
+img.timeoutIcon {
+    width: 14px;
+    height: 14px;
+    margin-top: 7px;
+}
+
+.chat-line__moderation, .chat-line__status {
+    color: hsla(0, 0%, 100%, .6) !important;
+}
+.mention-fragment {
+	background-color: hsla(0, 0%, 0%, 0) !important;
+}
+a {
+	color: hsla(42, 79%, 64%, 1) !important;
+}
+.user-notice-line {
+	background-color: hsla(285, 75%, 70%, .25) !important;
+}
+.user-notice-line .tw-c-text-alt-2 {
+    color: white !important;
+}
+
+.chat-list__more-messages {
+	opacity: 0;
+}
+
+.noRep .chat-card__link {
+	display: none;
+}
+
+img#chatlock, img#resetbutton, img#tabwatchbutton {
+	width: 30px;
+    height: 30px;
+    cursor: pointer;
+  }
+img#resetbutton {
+	padding: 6px;
+}
+img#chatlock {
+	padding: 2px;
+}
+img#chatlock:hover {
+	background: rgba(100,65,164,.05);
+}
+img#chatlock.active {
+	background: hsla(210, 0%, 35%, 0.5);
+}
+img#tabwatchbutton {
+	padding: 5px;
+}

@@ -1,0 +1,58 @@
+	{
+	"name": "DailiesChat",
+	"version": "0.1",
+	"description": "Building a better chat window to use while streaming",
+	"permissions": ["storage", "file:///*", "tabs", "https://dailies.gg/*", "http://localhost/dailieslocal/*"],
+	"web_accessible_resources": [
+		"sounds/*.mp3", "images/*.png", "images/*.jpg"
+	],
+	"content_scripts": [
+		{
+			"matches": ["https://www.twitch.tv/popout/*"],
+			"run_at": "document_end",
+			"js": ["third-party/jquery-3.3.1.min.js", "privateData.js", "contentScript.js"],
+			"css": ["style.css"]
+		},
+		{
+			"matches": ["https://clips.twitch.tv/*"],
+			"run_at": "document_end",
+			"all_frames": true,
+			"js": ["third-party/jquery-3.3.1.min.js", "embeddedClip.js"]
+		},
+		{
+			"matches": ["https://twitter.com/*"],
+			"run_at": "document_end",
+			"all_frames": true,
+			"js": ["third-party/jquery-3.3.1.min.js", "twitter.js"]
+		},
+		{
+			"matches": ["https://twitter.com/mentions"],
+			"run_at": "document_end",
+			"all_frames": true,
+			"js": ["third-party/jquery-3.3.1.min.js", "twitterMentions.js"]
+		},
+		{
+			"matches": ["*://dailies.gg/votenumber*"],
+			"run_at": "document_end",
+			"all_frames": true,
+			"js": ["third-party/jquery-3.3.1.min.js", "votenumber.js"]
+		}
+	],
+	"background": {
+		"scripts": ["third-party/jquery-3.3.1.min.js", "background.js"],
+		"persistent": false
+	},
+	"icons": {
+		"128": "images/Medal-small-100.png"
+	},
+	"commands": {
+		"reset-votes": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+Y"
+			},
+			"description": "resets the vote arrays and counts",
+			"global": true
+		}
+	},
+	"manifest_version": 2
+}

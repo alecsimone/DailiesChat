@@ -1,0 +1,6 @@
+images/
+sounds/
+third-party/
+*.sublime-project
+*.sublime-workspace
+privateData.js
