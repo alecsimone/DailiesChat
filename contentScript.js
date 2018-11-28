@@ -1,5 +1,6 @@
-	// window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
-	window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
+	window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
+	// window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
+	console.log(window.ajaxURL);
 
 window.onload = function() {
 	removeRoomsBar();	
@@ -308,7 +309,14 @@ function checkMessageForVotes(messageTextPieces, messageSender) {
 				if (checkIfChatterHasRep(messageSender)) {
 					var voteNumber = getVoteNumber(lowercasedWord);
 					if (!isNaN(voteNumber)) {
-						contenderVote(messageSender, voteNumber);
+						contenderVote(messageSender, voteNumber, "yea");
+					}
+				}
+			} else if (lowercasedWord.includes('!nay')) {
+				if (checkIfChatterHasRep(messageSender)) {
+					var voteNumber = getVoteNumber(lowercasedWord);
+					if (!isNaN(voteNumber)) {
+						contenderVote(messageSender, voteNumber, "nay");
 					}
 				}
 			}
@@ -329,7 +337,12 @@ function turnMessagePieceIntoWords(messagePiece) {
 }
 function getVoteNumber(word) {
 	let voteLocation = word.indexOf('!vote');
-	let voteString = word.substring(5 + voteLocation);
+	if (voteLocation === -1) {
+		let nayLocation = word.indexOf('!nay');
+		var voteString = word.substring(4 + nayLocation);
+	} else {
+		var voteString = word.substring(5 + voteLocation);
+	}
 	return parseInt(voteString, 10);
 }
 
@@ -366,11 +379,11 @@ function sendVote(voter, direction) {
 	});
 }
 
-function contenderVote(voter, voteNumber) {
+function contenderVote(voter, voteNumber, direction) {
 	if (voteNumber === 0 || voteNumber > 25) {
 		return;
 	}
-	console.log(voter + " voted for play number " + voteNumber);
+	console.log(`${voter} voted ${direction} on play number ${voteNumber}`);
 	jQuery.ajax({
 		type: "POST",
 		url: window.ajaxURL,
@@ -378,6 +391,7 @@ function contenderVote(voter, voteNumber) {
 		data: {
 			voter,
 			voteNumber,
+			direction,
 			action: 'chat_contender_vote',
 		},
 		error: function(one, two, three) {
