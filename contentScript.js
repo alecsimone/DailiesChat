@@ -1,5 +1,5 @@
-	window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
-	// window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
+	// window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
+	window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
 	console.log(window.ajaxURL);
 
 window.onload = function() {
