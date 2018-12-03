@@ -305,7 +305,7 @@ function checkMessageForVotes(messageTextPieces, messageSender) {
 				voteYea = true;
 			} else if (lowercasedWord === 'votenay' || lowercasedWord === 'neigh' || lowercasedWord === 'vn') {
 				voteNay = true;
-			} else if (lowercasedWord.includes('!vote')) {
+			} else if (lowercasedWord.includes('!vote') || lowercasedWord.includes('!yea')) {
 				if (checkIfChatterHasRep(messageSender)) {
 					var voteNumber = getVoteNumber(lowercasedWord);
 					if (!isNaN(voteNumber)) {
@@ -333,13 +333,18 @@ function checkMessageForVotes(messageTextPieces, messageSender) {
 	return false;
 }
 function turnMessagePieceIntoWords(messagePiece) {
-	return messagePiece.split(' ');
+	return messagePiece.split(/[ ,.]+/);
 }
 function getVoteNumber(word) {
 	let voteLocation = word.indexOf('!vote');
 	if (voteLocation === -1) {
 		let nayLocation = word.indexOf('!nay');
-		var voteString = word.substring(4 + nayLocation);
+		if (nayLocation === -1) {
+			let yeaLocation = word.indexOf('!yea');
+			var voteString = word.substring(4 + yeaLocation);
+		} else {
+			var voteString = word.substring(4 + nayLocation);
+		}
 	} else {
 		var voteString = word.substring(5 + voteLocation);
 	}
@@ -466,7 +471,7 @@ var wordReplacements = {
 function wordReplacer(messageTextPieces) {
 	messageTextPieces.forEach( (messageTextPiece) => {
 		var theMessage = messageTextPiece.innerText;
-		let messageTextArray = theMessage.split(' ');
+		let messageTextArray = turnMessagePieceIntoWords(theMessage);
 		messageTextArray.forEach( (word) => {
 			lowercasedWord = word.toLowerCase();
 			if ( wordReplacements.hasOwnProperty(lowercasedWord) ) {
