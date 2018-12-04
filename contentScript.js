@@ -668,7 +668,7 @@ function soundEngine(messageObject) {
 		return;
 	}
 
-	let wordsArray = msg.split(' ');
+	let wordsArray = turnMessagePieceIntoWords(msg);
 	wordsArray.forEach((word) => {
 		if (word === 'vy') {
 			sounds.sounds.ding.play();
