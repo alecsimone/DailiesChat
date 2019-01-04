@@ -16,24 +16,24 @@ window.onload = function() {
 	addResetButton(leftButtons);
 	addTabWatchButton(leftButtons);
 
-	wholeChatBox.click(function(e) {
-		if (window.isFiltering) {
-			stopFilteringChat(wholeChatBox);
-		}
-		var theMessage = e.target.closest('.chat-line__message');
-		if (theMessage === null) {
-			return;
-		} else if ($(e.target).attr("data-a-target") === 'chat-message-username') {
-			e.stopImmediatePropagation();
-			let senderToSurvive = e.target.textContent;
-			filterChat(wholeChatBox, senderToSurvive);
-		} else if ($(e.target).attr("data-a-target") === 'chat-message-mention') {
-			let mentionText = e.target.textContent;
-			let senderToSurvive = mentionText.substring(1);
-			filterChat(wholeChatBox, senderToSurvive);
-		}
-		//theMessage.style.borderBottom = "1px solid hsla(0, 0%, 100%, .4)";
-	});
+	// wholeChatBox.click(function(e) {
+	// 	if (window.isFiltering) {
+	// 		stopFilteringChat(wholeChatBox);
+	// 	}
+	// 	var theMessage = e.target.closest('.chat-line__message');
+	// 	if (theMessage === null) {
+	// 		return;
+	// 	} else if ($(e.target).attr("data-a-target") === 'chat-message-username') {
+	// 		e.stopImmediatePropagation();
+	// 		let senderToSurvive = e.target.textContent;
+	// 		filterChat(wholeChatBox, senderToSurvive);
+	// 	} else if ($(e.target).attr("data-a-target") === 'chat-message-mention') {
+	// 		let mentionText = e.target.textContent;
+	// 		let senderToSurvive = mentionText.substring(1);
+	// 		filterChat(wholeChatBox, senderToSurvive);
+	// 	}
+	// 	//theMessage.style.borderBottom = "1px solid hsla(0, 0%, 100%, .4)";
+	// });
 
 	wholeChatBox.on('mouseenter', '.chat-author__display-name', function(e) {
 		whitenName(e.target);
@@ -113,7 +113,7 @@ function processMessage(message) {
 	var emotes = fullMsgHTML.querySelectorAll(".chat-line__message--emote");
 	let emoteVote = checkEmotesForVotes(emotes, messageSender);
 
-	var messageTextPieces = fullMsgHTML.querySelectorAll('[data-a-target="chat-message-text"]');
+	var messageTextPieces = fullMsgHTML.querySelectorAll('[data-a-target="chat-message-text"]');;
 	let textVote = checkMessageForVotes(messageTextPieces, messageSender);
 
 	if ( (emoteVote === 'yea' && (!textVote || textVote === 'yea') ) || (textVote === 'yea' && (!emoteVote || emoteVote === 'yea') ) ) {
@@ -122,7 +122,7 @@ function processMessage(message) {
 		sendVote(messageSender, 'nay');
 	}
 
-	var wholeMessageContent = fullMsgHTML.querySelectorAll('[data-a-target="chat-message-text"], .chat-line__message--emote');
+	var wholeMessageContent = fullMsgHTML.querySelectorAll('[data-a-target="chat-message-text"], .chat-line__message--emote, .mention-fragment');
 	var wholeMessage = turnWholeMessageIntoWords(wholeMessageContent);
 
 	var messageObject = {
@@ -132,6 +132,7 @@ function processMessage(message) {
 	soundEngine(messageObject);
 	checkForPPUpdate(messageObject);
 	wordReplacer(messageTextPieces);
+	checkForRepGiving(messageObject);
 }
 
 function removeRoomsBar() {
@@ -262,12 +263,12 @@ function notifyOfParticipation(messageSender) {
 			console.log(three);
 		},
 		success: function(data) {
-			if (Number.isInteger(data)) {
-				window.TwitchUserDB[messageSender.toLowerCase()].rep = data;
-				console.log(`${messageSender} now has ${data} rep`);
-			} else {
-				console.log(data);
-			}
+			// if (Number.isInteger(data)) {
+			// 	window.TwitchUserDB[messageSender.toLowerCase()].rep = data;
+			// 	console.log(`${messageSender} now has ${data} rep`);
+			// } else {
+			// 	console.log(data);
+			// }
 		}
 	});
 }
@@ -305,14 +306,16 @@ function checkMessageForVotes(messageTextPieces, messageSender) {
 				voteYea = true;
 			} else if (lowercasedWord === 'votenay' || lowercasedWord === 'neigh' || lowercasedWord === 'vn') {
 				voteNay = true;
-			} else if (lowercasedWord.includes('!vote') || lowercasedWord.includes('!yea')) {
+			} else if (lowercasedWord.includes('!vote') || lowercasedWord.includes('!yea') || lowercasedWord.match('![v|y][0-9]+') !== null) {
+				console.log("That's a yea vote!");
 				if (checkIfChatterHasRep(messageSender)) {
 					var voteNumber = getVoteNumber(lowercasedWord);
 					if (!isNaN(voteNumber)) {
 						contenderVote(messageSender, voteNumber, "yea");
 					}
 				}
-			} else if (lowercasedWord.includes('!nay')) {
+			} else if (lowercasedWord.includes('!nay') || lowercasedWord.match('!n[0-9]+') !== null) {
+				console.log("that's a nay vote!");
 				if (checkIfChatterHasRep(messageSender)) {
 					var voteNumber = getVoteNumber(lowercasedWord);
 					if (!isNaN(voteNumber)) {
@@ -335,26 +338,31 @@ function checkMessageForVotes(messageTextPieces, messageSender) {
 function turnMessagePieceIntoWords(messagePiece) {
 	return messagePiece.split(/[ ,.]+/);
 }
+// function getVoteNumber(word) {
+// 	let voteLocation = word.indexOf('!vote');
+// 	if (voteLocation === -1) {
+// 		let nayLocation = word.indexOf('!nay');
+// 		if (nayLocation === -1) {
+// 			let yeaLocation = word.indexOf('!yea');
+// 			var voteString = word.substring(4 + yeaLocation);
+// 		} else {
+// 			var voteString = word.substring(4 + nayLocation);
+// 		}
+// 	} else {
+// 		var voteString = word.substring(5 + voteLocation);
+// 	}
+// 	return parseInt(voteString, 10);
+// }
 function getVoteNumber(word) {
-	let voteLocation = word.indexOf('!vote');
-	if (voteLocation === -1) {
-		let nayLocation = word.indexOf('!nay');
-		if (nayLocation === -1) {
-			let yeaLocation = word.indexOf('!yea');
-			var voteString = word.substring(4 + yeaLocation);
-		} else {
-			var voteString = word.substring(4 + nayLocation);
-		}
-	} else {
-		var voteString = word.substring(5 + voteLocation);
-	}
-	return parseInt(voteString, 10);
+	let matchData = word.match(/[!](?:vote|yea|nay|v|y|n)/);
+	let voteNumber = word.substring(matchData[0].length + matchData.index);
+	return voteNumber;
 }
 
 function turnWholeMessageIntoWords(messageArray) {
 	var wholeMessage = '';
 	$.each(messageArray, function(index, val) {
-		if ($(val).attr("data-a-target") === 'chat-message-text') {
+		if ($(val).attr("data-a-target") === 'chat-message-text' || $(val).attr("data-a-target") === 'chat-message-mention') {
 			wholeMessage = wholeMessage + val.textContent;
 		} else if (val.className.indexOf('chat-image') > -1)  {
 			wholeMessage = wholeMessage + val.alt;
@@ -486,6 +494,47 @@ function wordReplacer(messageTextPieces) {
 	});
 }
 
+function checkForRepGiving(messageObject) {
+	let speaker = messageObject.messageSender;
+	let message = messageObject.wholeMessage;
+	let messageArray = message.split(/[ ,.]+/);
+	messageArray.forEach((word, index) => {
+		if (word === "!give") {
+			let target = messageArray[index + 1];
+			if (target === undefined) {
+				printToChat(`${speaker}, You didn't pick anyone to give rep to!`, "error");
+			}
+			if (target[0] === "@") {target = target.substring(1);}
+			if (target == speaker.toLowerCase()) {
+				console.log("You can't give yourself rep!");
+				return;
+			}
+			let amount = messageArray[index + 2];
+			if (isNaN(amount)) {amount = 1;}
+			jQuery.ajax({
+				type: "POST",
+				url: window.ajaxURL,
+				dataType: 'json',
+				data: {
+					speaker,
+					target,
+					amount,
+					action: 'give_rep',
+				},
+				error: function(one, two, three) {
+					console.log(one);
+					console.log(two);
+					console.log(three);
+				},
+				success: function(data) {
+					// printToChat(data.message, data.tone);
+					console.log(data);
+				}
+			});
+		}
+	})
+}
+
 function getTwitchUserDB() {
 	jQuery.ajax({
 		type: "POST",
@@ -509,7 +558,7 @@ function getTwitchUserDB() {
 		}
 	});
 }
-window.setInterval(getTwitchUserDB, 30000);
+window.setInterval(getTwitchUserDB, 15000);
 
 const defaultPic = chrome.runtime.getURL('images/defaultPic.jpg');
 function showProfilePicture(messageSender, fullMsgHTML) {
@@ -789,7 +838,7 @@ var customEntrances = {
 		wavepunk: 0.4,
 		wakon1: 0.4,
 		novacorpsrl: 0.1,
-		gamazzle: 0.2,
+		merry_christmazzle: 0.2,
 		flamingtreerl: .3,
 		orange_burst: 1,
 		notdrumzorz: 1,
@@ -818,4 +867,16 @@ function announce(arriver) {
 	} else if (mods.includes(arriver)) {
 		sounds.sounds.fanfare.play();
 	}
+}
+
+function printToChat(message, tone="success") {
+	console.log(message);
+	let wholeChatBox = $(".chat-list");
+	let chatMessagesContainer = $("[role='log']");
+	let messageColor = "hsla(106, 68%, 54%, 1)";
+	if (tone === "error") {
+		messageColor = "hsla(0, 68%, 54%, 1)";
+	}
+	let wrappedMessage = `<div class="printed_message" style="color: ${messageColor}; font-weight: bold;">${message}</div>`;
+	chatMessagesContainer.append(wrappedMessage);
 }
