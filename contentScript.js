@@ -9,31 +9,14 @@ window.onload = function() {
 	getTwitchUserDB();
 
 	var wholeChatBox = $(".chat-list");
-	var leftButtons = $(".tw-flex.tw-flex-row");
+	var leftButtons = $($(".tw-flex.tw-flex-row")[0]);
+
+	console.log(leftButtons);
 
 	addChatBG(wholeChatBox);
 	addLockButton(leftButtons);
 	addResetButton(leftButtons);
 	addTabWatchButton(leftButtons);
-
-	// wholeChatBox.click(function(e) {
-	// 	if (window.isFiltering) {
-	// 		stopFilteringChat(wholeChatBox);
-	// 	}
-	// 	var theMessage = e.target.closest('.chat-line__message');
-	// 	if (theMessage === null) {
-	// 		return;
-	// 	} else if ($(e.target).attr("data-a-target") === 'chat-message-username') {
-	// 		e.stopImmediatePropagation();
-	// 		let senderToSurvive = e.target.textContent;
-	// 		filterChat(wholeChatBox, senderToSurvive);
-	// 	} else if ($(e.target).attr("data-a-target") === 'chat-message-mention') {
-	// 		let mentionText = e.target.textContent;
-	// 		let senderToSurvive = mentionText.substring(1);
-	// 		filterChat(wholeChatBox, senderToSurvive);
-	// 	}
-	// 	//theMessage.style.borderBottom = "1px solid hsla(0, 0%, 100%, .4)";
-	// });
 
 	wholeChatBox.on('mouseenter', '.chat-author__display-name', function(e) {
 		whitenName(e.target);
@@ -151,6 +134,7 @@ function addChatBG(wholeChatBox) {
 }
 
 function addLockButton(container) {
+	console.log(container);
 	var lock = chrome.runtime.getURL('images/lock.png');
 	container.append("<img id='chatlock' src='" + lock + "'>");
 	$("#chatlock").click(function() {
@@ -639,6 +623,7 @@ function updateMyPP(messageSender) {
 				data: {
 					twitchName: messageSender,
 					twitchPic: picSrc,
+					twitchID: data.users[0]['_id'],
 					action: 'update_twitch_db',
 				},
 				error: function(one, two, three) {
@@ -843,9 +828,13 @@ var customEntrances = {
 		orange_burst: 1,
 		notdrumzorz: 1,
 		sixnineactual: .5,
-		eroticnugget: .1,
+		manhattaan: .1,
 		nyptrox: .4,
 		haxzyt: .1,
+		ganerrl: .8,
+		fisheysauce: 1,
+		iamjokarman: 1,
+		therewillbebears: .6,
 	},
 	entrances: [],
 };

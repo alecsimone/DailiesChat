@@ -20,6 +20,9 @@
 .chat-line__message:first-line {
 	line-height: 32px;
 }
+.chat-line__message--emote-button {
+	text-indent: 0;
+}
 
 img.chatter-avatar {
 	position: absolute;
