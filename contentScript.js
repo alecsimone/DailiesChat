@@ -11,8 +11,6 @@ window.onload = function() {
 	var wholeChatBox = $(".chat-list");
 	var leftButtons = $($(".tw-flex.tw-flex-row")[0]);
 
-	console.log(leftButtons);
-
 	addChatBG(wholeChatBox);
 	addLockButton(leftButtons);
 	addResetButton(leftButtons);
@@ -134,7 +132,6 @@ function addChatBG(wholeChatBox) {
 }
 
 function addLockButton(container) {
-	console.log(container);
 	var lock = chrome.runtime.getURL('images/lock.png');
 	container.append("<img id='chatlock' src='" + lock + "'>");
 	$("#chatlock").click(function() {
@@ -398,6 +395,7 @@ function contenderVote(voter, voteNumber, direction) {
 		},
 		success: function(data) {
 			console.log(data);
+			printToChat(data);
 		}
 	});
 }
@@ -805,14 +803,14 @@ var customEntrances = {
 		strangest_stranger: 0.3,
 		seamuscahill: 0.1, 
 		fluctuantflatulence: 0.2,
-		carbonttv: 0.6,
+		carbonttv: 0.4,
 		shadow30128: 0.3,
 		refrigeratedtoiletpaper: 0.5,
 		orionrl: 0.7,
 		pyre_eu: 0.4,
-		satan_is_dirty: 0.4,
+		satan_is_dirty: 0.2,
 		thatguy_from_thatthing: 0.4,
-		thecactuskeed: 0.6,
+		thecactuskeed: 0.5,
 		jwols: 0.6,
 		chillpanda5213_rl: 0.6,
 		jake_kaufmann: 0.2,
@@ -821,20 +819,20 @@ var customEntrances = {
 		crossingmarko: 0.5,
 		ollopa: 0.4,
 		wavepunk: 0.4,
-		wakon1: 0.4,
+		wakon1: 0.2,
 		novacorpsrl: 0.1,
 		merry_christmazzle: 0.2,
 		flamingtreerl: .3,
-		orange_burst: 1,
+		orange_burst: .5,
 		notdrumzorz: 1,
 		sixnineactual: .5,
 		manhattaan: .1,
-		nyptrox: .4,
+		nyptrox: .2,
 		haxzyt: .1,
-		ganerrl: .8,
-		fisheysauce: 1,
-		iamjokarman: 1,
-		therewillbebears: .6,
+		ganerrl: .6,
+		fisheysauce: .7,
+		iamjokarman: .8,
+		therewillbebears: .4,
 	},
 	entrances: [],
 };
