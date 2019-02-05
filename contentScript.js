@@ -76,7 +76,7 @@ function processMessage(message) {
 	}
 
 	let badges = fullMsgHTML.querySelectorAll('.chat-badge');
-	processBadges(badges);
+	processBadges(badges, messageSender);
 
 	let modIcons = fullMsgHTML.querySelectorAll('.mod-icon');
 	processModIcons(modIcons);
@@ -221,7 +221,7 @@ function recolorName(nameToRecolor) {
 
 function recognizeNewChatters(message, messageSender) {
 	if (!window.chattersSoFar.includes(messageSender.toLowerCase())) {
-		message.style.background = "hsla(225, 40%, 50%, .2)";
+		message.style.background = "hsla(225, 40%, 60%, .25)";
 		window.chattersSoFar.push(messageSender.toLowerCase());
 		announce(messageSender.toLowerCase());
 		updateMyPP(messageSender);
@@ -412,10 +412,12 @@ function processLinks(links, messageSender) {
 
 const dailiesBadge = chrome.runtime.getURL('images/subBadge.png');
 const modBadge = chrome.runtime.getURL('images/sword.jpg');
-function processBadges(badges) {
+function processBadges(badges, messageSender) {
+	let isSub = false;
 	jQuery.each(badges, function(index, badge) {
 		badge = jQuery(badge);
 		if (badge.attr("aria-label").indexOf("Subscriber") > -1) {
+			isSub = true;
 			let badgeContainer = badge.parent();
 			badge.css("display", "none");
 			badgeContainer.append(`<img class='dailiesSubBadge chat-badge' src='${dailiesBadge}'>`);
@@ -427,7 +429,14 @@ function processBadges(badges) {
 		} else {
 			badge.css("display", "none");
 		}
-	})
+	});
+	if (isSub === false && getChatterContribution(messageSender) > 0) {
+		let chatBadge = `<img class='dailiesSubBadge chat-badge' src='${dailiesBadge}'>`;
+		let badgeContainer = jQuery(badges[0]).parent().parent();
+		let wholeMessage = badgeContainer.find('.chat-line__username');
+		console.log(wholeMessage);
+		wholeMessage.before(chatBadge);
+	}
 }
 
 const timeoutIcon = chrome.runtime.getURL('images/timeout.png');
@@ -438,6 +447,8 @@ function processModIcons(modIcons) {
 			element.css("display", "none");
 		} else if (element.attr("data-test-selector") === "chat-timeout-button") {
 			element.html(`<img class='timeoutIcon' src=${timeoutIcon}>`);
+		} else if (element.attr("data-test-selector") === "chat-delete-button") {
+			element.css("display", "none");
 		}
 	})
 }
@@ -548,12 +559,15 @@ function showProfilePicture(messageSender, fullMsgHTML) {
 	let twitchUserDB = window.TwitchUserDB;
 	if (twitchUserDB[messageSender] !== undefined) {
 		var senderPic = twitchUserDB[messageSender]['picture'];
+		if (twitchUserDB[messageSender]['manualPicture'] !== "none") {
+			senderPic = twitchUserDB[messageSender]['manualPicture'];
+		}
 	} else {
 		var senderPic = defaultPic;
 	}
 	if (senderPic === 'none') {
 		senderPic = defaultPic;
-	}	
+	}
 	//fullMsgHTML.wrap("<div class='messageWrapper'></div>");
 	fullMsgHTML.prepend(`<img src="${senderPic}" class="chatter-avatar ${messageSender}-avatar">`);
 }
@@ -576,6 +590,18 @@ function checkIfChatterHasRep(messageSender) {
 		}
 	}
 	return false;
+}
+function getChatterContribution(messageSender) {
+	if (window.TwitchUserDB[messageSender.toLowerCase()]) {
+		return Number(window.TwitchUserDB[messageSender.toLowerCase()].contribution);
+	}
+	return 0;
+}
+function getChatterRole(messageSender) {
+	if (window.TwitchUserDB[messageSender.toLowerCase()]) {
+		return window.TwitchUserDB[messageSender.toLowerCase()].role;
+	}
+	return "--";
 }
 
 function checkForPPUpdate(messageObject) {
@@ -719,6 +745,13 @@ function soundEngine(messageObject) {
 		sounds.sounds.neigh.play();
 	}
 
+	if (getChatterContribution(messageObject.messageSender) < 3) {
+		if (getChatterRole(messageObject.messageSender) !== "editor" && getChatterRole(messageObject.messageSender) !== "administrator") {
+			console.log("no sound privileges");
+			return;
+		}
+	}
+
 	if (msg.indexOf('!justa') > -1) {
 		sounds.sounds.yawn.play();
 	} else if (msg.indexOf('burn it') > -1) {
@@ -823,7 +856,7 @@ var customEntrances = {
 		novacorpsrl: 0.1,
 		merry_christmazzle: 0.2,
 		flamingtreerl: .3,
-		orange_burst: .5,
+		orange_burst: 1,
 		notdrumzorz: 1,
 		sixnineactual: .5,
 		manhattaan: .1,

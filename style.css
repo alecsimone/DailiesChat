@@ -35,6 +35,10 @@ img.chatter-avatar {
 img.dailiesSubBadge.chat-badge, img.dailiesModBadge.chat-badge {
     width: 22px;
 }
+img.dailiesSubBadge.chat-badge {
+	border-radius: 100%;
+	box-shadow: 0 0 6px hsla(0, 0%, 100%, 0.6);
+}
 img.timeoutIcon {
     width: 14px;
     height: 14px;
