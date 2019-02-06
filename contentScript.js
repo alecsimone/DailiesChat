@@ -1,5 +1,5 @@
-	// window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
-	window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
+	window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
+	// window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
 	console.log(window.ajaxURL);
 
 window.onload = function() {
@@ -70,6 +70,9 @@ function processMessage(message) {
 	fixNameColor(displayName);
 	showProfilePicture(messageSenderLowerCase, fullMsgHTML);
 	addRepToName(messageSenderLowerCase, displayName);
+	// if (window.activeDiscussion) {
+		dimByRepAndContribution(fullMsgHTML, messageSender);
+	// }
 
 	if (!checkIfChatterHasRep(messageSenderLowerCase)) {
 		fullMsgHTML.classList.add('noRep');
@@ -86,7 +89,17 @@ function processMessage(message) {
 		processLinks(links, messageSender);
 	}
 
+	var wholeMessageContent = fullMsgHTML.querySelectorAll('[data-a-target="chat-message-text"], .chat-line__message--emote, .mention-fragment');
+	var wholeMessage = turnWholeMessageIntoWords(wholeMessageContent);
+
 	if (messageSender === 'Nightbot') {
+		if (wholeMessage.indexOf("Now discussing") > -1) {
+			window.activeDiscussion = true;
+		} else if (wholeMessage.indexOf("has moved on to the final round") > -1) {
+			window.activeDiscussion = false;
+		} else if (wholeMessage.indexOf("has been killed") > -1) {
+			window.activeDiscussion = false;
+		}
 		return;
 	}
 	recognizeNewChatters(fullMsgHTML, messageSender);
@@ -102,9 +115,6 @@ function processMessage(message) {
 	} else if ( (emoteVote === 'nay' && (!textVote || textVote === 'nay') ) || (textVote === 'nay' && (!emoteVote || emoteVote === 'nay') ) ) {
 		sendVote(messageSender, 'nay');
 	}
-
-	var wholeMessageContent = fullMsgHTML.querySelectorAll('[data-a-target="chat-message-text"], .chat-line__message--emote, .mention-fragment');
-	var wholeMessage = turnWholeMessageIntoWords(wholeMessageContent);
 
 	var messageObject = {
 		messageSender,
@@ -124,6 +134,7 @@ function removeRoomsBar() {
 function setupGlobalVariables() {
 	window.isFiltering = false;
 	window.chattersSoFar = [];
+	window.activeDiscussion = false;
 }
 
 function addChatBG(wholeChatBox) {
@@ -434,7 +445,6 @@ function processBadges(badges, messageSender) {
 		let chatBadge = `<img class='dailiesSubBadge chat-badge' src='${dailiesBadge}'>`;
 		let badgeContainer = jQuery(badges[0]).parent().parent();
 		let wholeMessage = badgeContainer.find('.chat-line__username');
-		console.log(wholeMessage);
 		wholeMessage.before(chatBadge);
 	}
 }
@@ -461,6 +471,17 @@ function fixNameColor(displayName) {
 	if (!checkIfChatterHasRep(displayName.textContent)) {
 		displayName.style.color = 'hsla(0, 0%, 80%, .5)';
 	}
+}
+
+function dimByRepAndContribution(fullMsgHTML, messageSender) {
+	let chatterRep = window.TwitchUserDB[messageSender.toLowerCase()].rep;
+	let chatterOpacity = (chatterRep / 20 * .6) + .4;
+	if (chatterOpacity > 1) {chatterOpacity = 1;}
+
+	let chatterContribution = getChatterContribution(messageSender);
+	if (chatterContribution > 0) {chatterOpacity = 1;}
+
+	fullMsgHTML.style.opacity = chatterOpacity.toString();
 }
 
 var voteYeaEmote = chrome.runtime.getURL('images/voteyea.png');
@@ -866,6 +887,7 @@ var customEntrances = {
 		fisheysauce: .7,
 		iamjokarman: .8,
 		therewillbebears: .4,
+		jkbdoug: 1,
 	},
 	entrances: [],
 };
