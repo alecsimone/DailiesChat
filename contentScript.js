@@ -71,7 +71,7 @@ function processMessage(message) {
 	showProfilePicture(messageSenderLowerCase, fullMsgHTML);
 	addRepToName(messageSenderLowerCase, displayName);
 	// if (window.activeDiscussion) {
-		dimByRepAndContribution(fullMsgHTML, messageSender);
+	// 	dimByRepAndContribution(fullMsgHTML, messageSender);
 	// }
 
 	if (!checkIfChatterHasRep(messageSenderLowerCase)) {
@@ -127,7 +127,7 @@ function processMessage(message) {
 }
 
 function removeRoomsBar() {
-	var roomsBar = $(".room-selector__header")[0];
+	var roomsBar = $(".rooms-header")[0];
 	roomsBar.remove();
 }
 
@@ -406,7 +406,11 @@ function contenderVote(voter, voteNumber, direction) {
 		},
 		success: function(data) {
 			console.log(data);
-			printToChat(data);
+			if (direction === "nay") {
+				printToChat(data, "error");
+			} else {
+				printToChat(data);
+			}
 		}
 	});
 }
@@ -857,10 +861,10 @@ var customEntrances = {
 		strangest_stranger: 0.3,
 		seamuscahill: 0.1, 
 		fluctuantflatulence: 0.2,
-		carbonttv: 0.4,
+		Carb0nRL: 1,
 		shadow30128: 0.3,
 		refrigeratedtoiletpaper: 0.5,
-		orionrl: 0.7,
+		orionrl: 1,
 		pyre_eu: 0.4,
 		satan_is_dirty: 0.2,
 		thatguy_from_thatthing: 0.4,
@@ -875,7 +879,7 @@ var customEntrances = {
 		wavepunk: 0.4,
 		wakon1: 0.2,
 		novacorpsrl: 0.1,
-		merry_christmazzle: 0.2,
+		gamazzle01: 0.4,
 		flamingtreerl: .3,
 		orange_burst: 1,
 		notdrumzorz: 1,
@@ -888,6 +892,8 @@ var customEntrances = {
 		iamjokarman: .8,
 		therewillbebears: .4,
 		jkbdoug: 1,
+		kutturamaswami: 1,
+		guann: 1,
 	},
 	entrances: [],
 };
@@ -903,7 +909,10 @@ function announce(arriver) {
 	var mods = [
 		'chimblade', 'dailiesalec', 'derrothh', 'dudewiththenose', 'mrtoastymuffinz', 'mysterylsg', 'orionrl', 'refrigeratedtoiletpaper', 'sid_o7', 'skyrider50', 'strangest_stranger', 'theturbolemming', 'wakon1'
 	];
-
+	if (arriver === "Carb0nRL") {
+		console.log(customEntrances['entrances'][arriver]);
+		console.log("Carbon just showed up");
+	}
 	if (arriver in customEntrances.entranceFiles) {
 		customEntrances['entrances'][arriver].play();
 	} else if (mods.includes(arriver)) {
