@@ -68,7 +68,6 @@ function processMessage(message) {
 	let displayName = fullMsgHTML.querySelector(".chat-author__display-name");
 	var messageSenderLowerCase = messageSender.toLowerCase();
 	fixNameColor(displayName);
-	console.log("yo");
 	showProfilePicture(messageSenderLowerCase, fullMsgHTML);
 	addRepToName(messageSenderLowerCase, displayName);
 	// if (window.activeDiscussion) {
@@ -559,29 +558,15 @@ function getTwitchUserDB() {
 	let queryData = {
 		action: "share_twitch_user_db"
 	};
-	let returnData = ajaxReplacement(queryData);
-	console.log(returnData);
-	// jQuery.ajax({
-	// 	type: "POST",
-	// 	url: window.ajaxURL,
-	// 	dataType: 'json',
-	// 	data: {
-	// 		action: 'share_twitch_user_db',
-	// 	},
-	// 	error: function(one, two, three) {
-	// 		console.log(one);
-	// 		console.log(two);
-	// 		console.log(three);
-	// 	},
-	// 	success: function(data) {
-	// 		let lowerCasedKeysData = {};
-	// 		jQuery.each(data, function(index, val) {
-	// 			let lowercaseIndex = index.toLowerCase();
-	// 			lowerCasedKeysData[lowercaseIndex] = val;
-	// 		});
-	// 		window.TwitchUserDB = lowerCasedKeysData;
-	// 	}
-	// });
+	ajaxReplacement(queryData)
+		.then(function(data) {
+			let lowerCasedKeysData = {};
+			jQuery.each(data, function(index, val) {
+				let lowercaseIndex = index.toLowerCase();
+				lowerCasedKeysData[lowercaseIndex] = val;
+			});
+			window.TwitchUserDB = lowerCasedKeysData;
+		});
 }
 window.setInterval(getTwitchUserDB, 15000);
 
@@ -717,34 +702,6 @@ function resetVotes() {
 			console.log(data);
 		}
 	});
-}
-
-function tabwatchInit() {
-	if (window.confirm("Do you want to reset the voteledgers?")) {
-		console.log("Tab watch button pressed");
-		jQuery.ajax({
-			type: "POST",
-			url: window.ajaxURL,
-			dataType: 'json',
-			data: {
-				action: 'get_contender_urls',
-			},
-			error: function(one, two, three) {
-				console.log(one);
-				console.log(two);
-				console.log(three);
-			},
-			success: function(data) {
-				console.log("Contender URLs returned from server");
-				console.log(data);
-				var messageObject = {
-					urlDataMessage: true,
-					data
-				}
-				chrome.runtime.sendMessage(messageObject);
-			}
-		});
-	}
 }
 
 function soundEngine(messageObject) {
@@ -940,5 +897,9 @@ function printToChat(message, tone="success") {
 }
 
 function ajaxReplacement(data) {
-	chrome.runtime.sendMessage(data, (response) => response);
+	return new Promise(function(resolve, reject) {
+		chrome.runtime.sendMessage(data, function(response) {
+			resolve(response.ajaxResponse);
+		});
+	});
 }
