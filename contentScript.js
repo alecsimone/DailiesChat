@@ -1,7 +1,3 @@
-	// window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
-	window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
-	console.log(window.ajaxURL);
-
 window.onload = function() {
 	removeRoomsBar();	
 	setupGlobalVariables();
@@ -242,28 +238,19 @@ function recognizeNewChatters(message, messageSender) {
 }
 
 function notifyOfParticipation(messageSender) {
-	jQuery.ajax({
-		type: "POST",
-		url: window.ajaxURL,
-		dataType: 'json',
-		data: {
-			messageSender,
-			action: 'notify_of_participation',
-		},
-		error: function(one, two, three) {
-			console.log(one);
-			console.log(two);
-			console.log(three);
-		},
-		success: function(data) {
+	let ajaxData = {
+		messageSender,
+		action: 'notify_of_participation',
+	};
+	ajaxReplacement(ajaxData)
+		.then(function(data) {
 			// if (Number.isInteger(data)) {
 			// 	window.TwitchUserDB[messageSender.toLowerCase()].rep = data;
 			// 	console.log(`${messageSender} now has ${data} rep`);
 			// } else {
 			// 	console.log(data);
 			// }
-		}
-	});
+		});
 }
 
 function checkEmotesForVotes(emotes, messageSender) {
@@ -365,24 +352,15 @@ function turnWholeMessageIntoWords(messageArray) {
 }
 
 function sendVote(voter, direction) {
-	jQuery.ajax({
-		type: "POST",
-		url: window.ajaxURL,
-		dataType: 'json',
-		data: {
-			voter,
-			direction,
-			action: 'chat_vote',
-		},
-		error: function(one, two, three) {
-			console.log(one);
-			console.log(two);
-			console.log(three);
-		},
-		success: function(data) {
+	let ajaxData = {
+		voter,
+		direction,
+		action: 'chat_vote',
+	};
+	ajaxReplacement(ajaxData)
+		.then(function(data) {
 			console.log(data);
-		}
-	});
+		});
 }
 
 function contenderVote(voter, voteNumber, direction) {
@@ -390,30 +368,21 @@ function contenderVote(voter, voteNumber, direction) {
 		return;
 	}
 	console.log(`${voter} voted ${direction} on play number ${voteNumber}`);
-	jQuery.ajax({
-		type: "POST",
-		url: window.ajaxURL,
-		dataType: 'json',
-		data: {
-			voter,
-			voteNumber,
-			direction,
-			action: 'chat_contender_vote',
-		},
-		error: function(one, two, three) {
-			console.log(one);
-			console.log(two);
-			console.log(three);
-		},
-		success: function(data) {
+	let ajaxData = {
+		voter,
+		voteNumber,
+		direction,
+		action: 'chat_contender_vote',
+	}
+	ajaxReplacement(ajaxData)
+		.then(function(data) {
 			console.log(data);
 			if (direction === "nay") {
 				printToChat(data, "error");
 			} else {
 				printToChat(data);
 			}
-		}
-	});
+		});
 }
 
 function processLinks(links, messageSender) {
@@ -530,35 +499,25 @@ function checkForRepGiving(messageObject) {
 			}
 			let amount = messageArray[index + 2];
 			if (isNaN(amount)) {amount = 1;}
-			jQuery.ajax({
-				type: "POST",
-				url: window.ajaxURL,
-				dataType: 'json',
-				data: {
-					speaker,
-					target,
-					amount,
-					action: 'give_rep',
-				},
-				error: function(one, two, three) {
-					console.log(one);
-					console.log(two);
-					console.log(three);
-				},
-				success: function(data) {
-					// printToChat(data.message, data.tone);
+			let ajaxData = {
+				speaker,
+				target,
+				amount,
+				action: 'give_rep',
+			}
+			ajaxReplacement(ajaxData)
+				.then(function(data) {
 					console.log(data);
-				}
-			});
+				});
 		}
 	})
 }
 
 function getTwitchUserDB() {
-	let queryData = {
+	let ajaxData = {
 		action: "share_twitch_user_db"
 	};
-	ajaxReplacement(queryData)
+	ajaxReplacement(ajaxData)
 		.then(function(data) {
 			let lowerCasedKeysData = {};
 			jQuery.each(data, function(index, val) {
@@ -657,25 +616,16 @@ function updateMyPP(messageSender) {
 			jQuery.each(allPriorPPs, function(index, pp) {
 				pp.src = picSrc;
 			});
-			jQuery.ajax({
-				type: "POST",
-				url: window.ajaxURL,
-				dataType: 'json',
-				data: {
-					twitchName: messageSender,
-					twitchPic: picSrc,
-					twitchID: data.users[0]['_id'],
-					action: 'update_twitch_db',
-				},
-				error: function(one, two, three) {
-					console.log(one);
-					console.log(two);
-					console.log(three);
-				},
-				success: function(data) {
+			let ajaxData = {
+				twitchName: messageSender,
+				twitchPic: picSrc,
+				twitchID: data.users[0]['_id'],
+				action: 'update_twitch_db',
+			}
+			ajaxReplacement(ajaxData)
+				.then(function(data) {
 					// console.log(data);
-				}
-			});
+				});
 		}
 	});
 }
@@ -686,22 +636,13 @@ function resetVotes() {
 	window.nayVoters = [];
 	var votecount = $('#votecount');
 	votecount.html(window.votecount);
-	jQuery.ajax({
-		type: "POST",
-		url: window.ajaxURL,
-		dataType: 'json',
-		data: {
-			action: 'reset_chat_votes',
-		},
-		error: function(one, two, three) {
-			console.log(one);
-			console.log(two);
-			console.log(three);
-		},
-		success: function(data) {
+	let ajaxData = {
+		action: 'reset_chat_votes',
+	}
+	ajaxReplacement(ajaxData)
+		.then(function(data) {
 			console.log(data);
-		}
-	});
+		})
 }
 
 function soundEngine(messageObject) {
