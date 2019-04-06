@@ -1,5 +1,5 @@
-	window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
-	// window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
+	// window.ajaxURL = 'http://localhost/dailieslocal/wp-admin/admin-ajax.php';
+	window.ajaxURL = 'https://dailies.gg/wp-admin/admin-ajax.php';
 	console.log(window.ajaxURL);
 
 window.onload = function() {
@@ -68,11 +68,13 @@ function processMessage(message) {
 	let displayName = fullMsgHTML.querySelector(".chat-author__display-name");
 	var messageSenderLowerCase = messageSender.toLowerCase();
 	fixNameColor(displayName);
+	console.log("yo");
 	showProfilePicture(messageSenderLowerCase, fullMsgHTML);
 	addRepToName(messageSenderLowerCase, displayName);
 	// if (window.activeDiscussion) {
 	// 	dimByRepAndContribution(fullMsgHTML, messageSender);
 	// }
+
 
 	if (!checkIfChatterHasRep(messageSenderLowerCase)) {
 		fullMsgHTML.classList.add('noRep');
@@ -554,27 +556,32 @@ function checkForRepGiving(messageObject) {
 }
 
 function getTwitchUserDB() {
-	jQuery.ajax({
-		type: "POST",
-		url: window.ajaxURL,
-		dataType: 'json',
-		data: {
-			action: 'share_twitch_user_db',
-		},
-		error: function(one, two, three) {
-			console.log(one);
-			console.log(two);
-			console.log(three);
-		},
-		success: function(data) {
-			let lowerCasedKeysData = {};
-			jQuery.each(data, function(index, val) {
-				let lowercaseIndex = index.toLowerCase();
-				lowerCasedKeysData[lowercaseIndex] = val;
-			});
-			window.TwitchUserDB = lowerCasedKeysData;
-		}
-	});
+	let queryData = {
+		action: "share_twitch_user_db"
+	};
+	let returnData = ajaxReplacement(queryData);
+	console.log(returnData);
+	// jQuery.ajax({
+	// 	type: "POST",
+	// 	url: window.ajaxURL,
+	// 	dataType: 'json',
+	// 	data: {
+	// 		action: 'share_twitch_user_db',
+	// 	},
+	// 	error: function(one, two, three) {
+	// 		console.log(one);
+	// 		console.log(two);
+	// 		console.log(three);
+	// 	},
+	// 	success: function(data) {
+	// 		let lowerCasedKeysData = {};
+	// 		jQuery.each(data, function(index, val) {
+	// 			let lowercaseIndex = index.toLowerCase();
+	// 			lowerCasedKeysData[lowercaseIndex] = val;
+	// 		});
+	// 		window.TwitchUserDB = lowerCasedKeysData;
+	// 	}
+	// });
 }
 window.setInterval(getTwitchUserDB, 15000);
 
@@ -885,7 +892,7 @@ var customEntrances = {
 		notdrumzorz: 1,
 		sixnineactual: .5,
 		manhattaan: .1,
-		nyptrox: .2,
+		avx_nyptrox: .2,
 		haxzyt: .1,
 		ganerrl: .6,
 		fisheysauce: .7,
@@ -894,6 +901,7 @@ var customEntrances = {
 		jkbdoug: 1,
 		kutturamaswami: 1,
 		guann: 1,
+		greentv23: 1,
 	},
 	entrances: [],
 };
@@ -921,7 +929,6 @@ function announce(arriver) {
 }
 
 function printToChat(message, tone="success") {
-	console.log(message);
 	let wholeChatBox = $(".chat-list");
 	let chatMessagesContainer = $("[role='log']");
 	let messageColor = "hsla(106, 68%, 54%, 1)";
@@ -930,4 +937,8 @@ function printToChat(message, tone="success") {
 	}
 	let wrappedMessage = `<div class="printed_message" style="color: ${messageColor}; font-weight: bold;">${message}</div>`;
 	chatMessagesContainer.append(wrappedMessage);
+}
+
+function ajaxReplacement(data) {
+	chrome.runtime.sendMessage(data, (response) => response);
 }
